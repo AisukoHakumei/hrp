@@ -1,0 +1,30 @@
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      ORIGIN: "http://localhost:3000"
+      DATABASE_PATH: /data/hrp.db
+      UPLOAD_DIR: /data/uploads
+      BACKUP_DIR: /data/backups
+      BODY_SIZE_LIMIT: "100M"
+      AUTH_SECRET: "${AUTH_SECRET:-change-me-in-production}"
+      LOG_LEVEL: info
+      DEFAULT_LOCALE: en
+      # OIDC_PROVIDER_NAME: Keycloak
+      # OIDC_ISSUER: https://auth.example.com/realms/home
+      # OIDC_CLIENT_ID: hrp
+      # OIDC_CLIENT_SECRET: your-client-secret
+      # OIDC_SCOPES: openid email profile
+    volumes:
+      - hrp-data:/data
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/api/health"]
+      interval: 15s
+      timeout: 3s
+      retries: 3
+
+volumes:
+  hrp-data:
